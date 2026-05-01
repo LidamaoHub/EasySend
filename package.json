@@ -1,0 +1,14 @@
+{
+  "name": "vercelsend",
+  "private": true,
+  "workspaces": [
+    "server-admin",
+    "desktop-client"
+  ],
+  "scripts": {
+    "dev:server": "npm --workspace server-admin run dev",
+    "build:server": "npm --workspace server-admin run build",
+    "dev:desktop": "npm --workspace desktop-client run dev",
+    "build:desktop": "npm --workspace desktop-client run build"
+  }
+}

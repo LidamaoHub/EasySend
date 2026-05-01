@@ -1,0 +1,10 @@
+node_modules
+.next
+dist
+coverage
+.DS_Store
+*.log
+server-admin/.env.local
+server-admin/.env
+desktop-client/src-tauri/target
+desktop-client/dist

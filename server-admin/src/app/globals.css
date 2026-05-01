@@ -1,0 +1,128 @@
+:root {
+  color-scheme: light;
+  font-family: "Geist", "Segoe UI", sans-serif;
+  background: #f5f3ed;
+  color: #1f1711;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(216, 171, 112, 0.22), transparent 32%),
+    linear-gradient(180deg, #f7f4ee 0%, #f0ece3 100%);
+}
+
+a {
+  color: inherit;
+}
+
+.page-shell {
+  min-height: 100vh;
+  padding: 32px;
+}
+
+.panel {
+  max-width: 960px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(31, 23, 17, 0.08);
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: 0 24px 80px rgba(43, 28, 15, 0.08);
+}
+
+.hero {
+  display: grid;
+  gap: 16px;
+}
+
+.hero h1,
+.hero h2 {
+  margin: 0;
+}
+
+.card-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-top: 24px;
+}
+
+.card {
+  background: #fffaf5;
+  border-radius: 18px;
+  padding: 18px;
+  border: 1px solid rgba(31, 23, 17, 0.08);
+}
+
+.form {
+  display: grid;
+  gap: 14px;
+  margin-top: 24px;
+  max-width: 420px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field input,
+.field textarea,
+.field select {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid rgba(31, 23, 17, 0.15);
+  padding: 12px 14px;
+  font: inherit;
+  background: #fff;
+}
+
+.button-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.button {
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font: inherit;
+  background: #22201d;
+  color: #fff9f2;
+  cursor: pointer;
+}
+
+.button.secondary {
+  background: #ece4d5;
+  color: #2b1c0f;
+}
+
+.meta {
+  color: #6e6258;
+  font-size: 14px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 24px;
+}
+
+.table th,
+.table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(31, 23, 17, 0.08);
+}
