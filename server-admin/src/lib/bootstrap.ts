@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import { policyDefaults, users } from "@/db/schema";
 import { getDb } from "@/lib/db";
+import { getEnvValue } from "@/lib/env";
 import { hashPassword } from "@/lib/auth";
 
 let bootstrapped = false;
@@ -24,8 +25,8 @@ export async function ensureBootstrapData() {
     });
   }
 
-  const adminEmail = process.env.ADMIN_EMAIL;
-  const adminPassword = process.env.ADMIN_PASSWORD;
+  const adminEmail = getEnvValue("EASY_SEND_ADMIN_EMAIL");
+  const adminPassword = getEnvValue("EASY_SEND_ADMIN_PASSWORD");
 
   if (adminEmail && adminPassword) {
     const [existingAdmin] = await db

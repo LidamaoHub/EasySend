@@ -1,7 +1,8 @@
 import { and, desc, eq, isNull, lt, sql } from "drizzle-orm";
-import { del, get as getBlob } from "@vercel/blob";
-import { itemFiles, itemTexts, items } from "@/db/schema";
+import { del, get as getBlob, head } from "@vercel/blob";
+import { devices, itemFiles, itemTexts, items } from "@/db/schema";
 import { getDb } from "@/lib/db";
+import { getEnvValue } from "@/lib/env";
 
 export async function getUsage(userId: string) {
   const db = getDb();
@@ -51,11 +52,13 @@ export async function listItems(params: {
       createdAt: items.createdAt,
       expiresAt: items.expiresAt,
       content: itemTexts.content,
+      deviceName: devices.deviceName,
       originalName: itemFiles.originalName,
       mimeType: itemFiles.mimeType,
       sizeBytes: itemFiles.sizeBytes,
     })
     .from(items)
+    .innerJoin(devices, eq(devices.id, items.deviceId))
     .leftJoin(itemTexts, eq(itemTexts.itemId, items.id))
     .leftJoin(itemFiles, eq(itemFiles.itemId, items.id))
     .where(and(...conditions))
@@ -70,6 +73,7 @@ export async function listItems(params: {
       contentBytes: Number(row.contentBytes),
       createdAt: row.createdAt,
       expiresAt: row.expiresAt,
+      deviceName: row.deviceName,
       contentPreview: row.content ?? undefined,
       file:
         row.kind === "file"
@@ -144,6 +148,15 @@ export async function createFileItem(params: {
   return item;
 }
 
+export async function verifyBlobExists(blobKey: string) {
+  const token = getEnvValue("easy_send_blob_READ_WRITE_TOKEN");
+  if (!token) {
+    throw new Error("easy_send_blob_READ_WRITE_TOKEN is not configured.");
+  }
+
+  return head(blobKey, { token });
+}
+
 export async function deleteItemOwnedByUser(params: { itemId: string; userId: string }) {
   const db = getDb();
   const rows = await db
@@ -164,7 +177,11 @@ export async function deleteItemOwnedByUser(params: { itemId: string; userId: st
 
   await db.update(items).set({ deletedAt: new Date() }).where(eq(items.id, item.id));
 
-  if (item.kind === "file" && item.blobKey && process.env.BLOB_READ_WRITE_TOKEN) {
+  if (
+    item.kind === "file" &&
+    item.blobKey &&
+    getEnvValue("easy_send_blob_READ_WRITE_TOKEN")
+  ) {
     await del(item.blobKey);
   }
 
@@ -191,7 +208,11 @@ export async function deleteItemById(itemId: string) {
 
   await db.update(items).set({ deletedAt: new Date() }).where(eq(items.id, item.id));
 
-  if (item.kind === "file" && item.blobKey && process.env.BLOB_READ_WRITE_TOKEN) {
+  if (
+    item.kind === "file" &&
+    item.blobKey &&
+    getEnvValue("easy_send_blob_READ_WRITE_TOKEN")
+  ) {
     await del(item.blobKey);
   }
 

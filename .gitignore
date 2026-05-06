@@ -8,3 +8,5 @@ server-admin/.env.local
 server-admin/.env
 desktop-client/src-tauri/target
 desktop-client/dist
+desktop-client/.env
+

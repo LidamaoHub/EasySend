@@ -9,6 +9,9 @@
     "dev:server": "npm --workspace server-admin run dev",
     "build:server": "npm --workspace server-admin run build",
     "dev:desktop": "npm --workspace desktop-client run dev",
-    "build:desktop": "npm --workspace desktop-client run build"
+    "build:desktop": "npm --workspace desktop-client run build",
+    "package:desktop": "npm --workspace desktop-client run tauri:build",
+    "package:desktop:mac": "npm --workspace desktop-client run tauri:build",
+    "package:desktop:current": "npm --workspace desktop-client run tauri:build"
   }
 }

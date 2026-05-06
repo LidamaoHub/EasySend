@@ -1,0 +1,111 @@
+name: Desktop Bundles
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  build-macos:
+    name: Build macOS
+    runs-on: macos-latest
+    env:
+      VITE_EASY_SEND_API_BASE_URL: ${{ vars.DESKTOP_API_BASE_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate desktop API base URL
+        run: |
+          if [ -z "$VITE_EASY_SEND_API_BASE_URL" ]; then
+            echo "Missing repository variable DESKTOP_API_BASE_URL."
+            echo "Set it to your deployed backend, for example: https://your-backend.vercel.app/api"
+            exit 1
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build macOS bundle
+        run: npm --workspace desktop-client run tauri:build
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: vercelsend-macos
+          if-no-files-found: error
+          path: |
+            desktop-client/src-tauri/target/release/bundle/dmg/*.dmg
+            desktop-client/src-tauri/target/release/bundle/macos/*.app
+
+  build-windows:
+    name: Build Windows
+    runs-on: windows-latest
+    env:
+      VITE_EASY_SEND_API_BASE_URL: ${{ vars.DESKTOP_API_BASE_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate desktop API base URL
+        shell: pwsh
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:VITE_EASY_SEND_API_BASE_URL)) {
+            Write-Error "Missing repository variable DESKTOP_API_BASE_URL. Set it to your deployed backend, for example: https://your-backend.vercel.app/api"
+          }
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Windows bundle
+        run: npm --workspace desktop-client run tauri:build
+
+      - name: Create portable ZIP
+        shell: pwsh
+        run: |
+          $releaseDir = "desktop-client/src-tauri/target/release"
+          $bundleDir = Join-Path $releaseDir "bundle/windows-portable"
+          New-Item -ItemType Directory -Force -Path $bundleDir | Out-Null
+
+          $exe = Get-ChildItem -Path $releaseDir -Filter *.exe -File |
+            Where-Object { $_.Name -notmatch "uninstall|setup|updater" } |
+            Select-Object -First 1
+
+          if (-not $exe) {
+            throw "Could not find built Windows executable in $releaseDir"
+          }
+
+          $zipPath = Join-Path $bundleDir "VercelSend-windows-portable.zip"
+          Compress-Archive -Path $exe.FullName -DestinationPath $zipPath -Force
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: vercelsend-windows
+          if-no-files-found: error
+          path: |
+            desktop-client/src-tauri/target/release/bundle/msi/*.msi
+            desktop-client/src-tauri/target/release/bundle/nsis/*.exe
+            desktop-client/src-tauri/target/release/bundle/windows-portable/*.zip

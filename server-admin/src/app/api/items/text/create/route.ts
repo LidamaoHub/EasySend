@@ -47,6 +47,7 @@ export async function POST(request: Request) {
     item: {
       id: item.id,
       kind: item.kind,
+      deviceName: auth.device.deviceName,
       contentPreview: parsed.data.content,
       contentBytes,
       createdAt: item.createdAt,
